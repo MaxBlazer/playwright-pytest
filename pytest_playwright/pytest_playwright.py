@@ -1,6 +1,7 @@
 import pytest
 from typing import Any
 
+
 def pytest_addoption(parser: Any) -> None:
     group = parser.getgroup("playwright", "Playwright")
     group.addoption(
@@ -61,7 +62,8 @@ def pytest_addoption(parser: Any) -> None:
         help="Whether to take a full page screenshot",
     )
 
-def pytest_configure(config: pytest.Config):
+
+def pytest_configure(config: pytest.Config) -> None:
     if config.pluginmanager.hasplugin("asyncio"):
         from pytest_playwright.asyncio import PytestPlaywrightAsyncio
 

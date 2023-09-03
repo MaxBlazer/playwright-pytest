@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import os
-from typing import Any, Callable, Dict, Generator, List
+from typing import Any, Callable, Dict, Generator, AsyncGenerator, List
 import pytest
 from playwright.async_api import (
     Browser,
@@ -33,14 +33,14 @@ from pytest_playwright.base import PytestPlaywright
 
 class PytestPlaywrightAsyncio(PytestPlaywright):
     @pytest.fixture(scope="session")
-    def event_loop(self):
+    def event_loop(self) -> Generator[asyncio.AbstractEventLoop, None, None]:
         policy = asyncio.get_event_loop_policy()
         loop = policy.new_event_loop()
         yield loop
         loop.close()
-        
+
     @pytest_asyncio.fixture(scope="session")
-    async def playwright(self) -> Generator[Playwright, None, None]:
+    async def playwright(self) -> AsyncGenerator[Playwright, None]:
         pw = await async_playwright().start()
         yield pw
         await pw.stop()
@@ -61,7 +61,7 @@ class PytestPlaywrightAsyncio(PytestPlaywright):
     @pytest_asyncio.fixture(scope="session")
     async def browser(
         self, launch_browser: Callable[[], Browser]
-    ) -> Generator[Browser, None, None]:
+    ) -> AsyncGenerator[Browser, None]:
         browser = await launch_browser()
         yield browser
         await browser.close()
@@ -74,7 +74,7 @@ class PytestPlaywrightAsyncio(PytestPlaywright):
         browser_context_args: Dict,
         pytestconfig: Any,
         request: pytest.FixtureRequest,
-    ) -> Generator[BrowserContext, None, None]:
+    ) -> AsyncGenerator[BrowserContext, None]:
         pages: List[Page] = []
 
         context_args_marker = next(
@@ -149,7 +149,7 @@ class PytestPlaywrightAsyncio(PytestPlaywright):
                 if not video:
                     continue
                 try:
-                    video_path = video.path()
+                    video_path = await video.path()
                     file_name = os.path.basename(video_path)
                     await video.save_as(
                         path=self._build_artifact_test_folder(
@@ -161,6 +161,6 @@ class PytestPlaywrightAsyncio(PytestPlaywright):
                     pass
 
     @pytest_asyncio.fixture
-    async def page(self, context: BrowserContext) -> Generator[Page, None, None]:
+    async def page(self, context: BrowserContext) -> AsyncGenerator[Page, None]:
         page = await context.new_page()
         yield page

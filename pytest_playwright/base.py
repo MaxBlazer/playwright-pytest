@@ -21,7 +21,6 @@ from typing import Any, Dict, Generator, List, Optional, TYPE_CHECKING
 import pytest
 from slugify import slugify
 import tempfile
-import pytest
 
 if TYPE_CHECKING:
     from playwright.sync_api import (
@@ -29,7 +28,8 @@ if TYPE_CHECKING:
         Playwright,
     )
 
-class PytestPlaywright(object):
+
+class PytestPlaywright:
     artifacts_folder = tempfile.TemporaryDirectory(prefix="playwright-pytest-")
 
     @pytest.fixture(scope="session", autouse=True)
@@ -167,7 +167,9 @@ class PytestPlaywright(object):
         return context_args
 
     @pytest.fixture(scope="session")
-    def browser_type(self, playwright: "Playwright", browser_name: str) -> "BrowserType":
+    def browser_type(
+        self, playwright: "Playwright", browser_name: str
+    ) -> "BrowserType":
         return getattr(playwright, browser_name)
 
     @pytest.fixture(scope="session")
