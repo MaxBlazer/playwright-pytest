@@ -1,8 +1,7 @@
 import pytest
-from typing import Any
 
 
-def pytest_addoption(parser: Any) -> None:
+def pytest_addoption(parser: pytest.Parser) -> None:
     group = parser.getgroup("playwright", "Playwright")
     group.addoption(
         "--browser",
@@ -62,9 +61,12 @@ def pytest_addoption(parser: Any) -> None:
         help="Whether to take a full page screenshot",
     )
 
+def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addini("playwright_pytest_asyncio", "Use asyncio Playwright fixtures. Default: when 'pytest-asyncio' plugin is activated=True, otherwise False", type="bool", default=None)
+
 
 def pytest_configure(config: pytest.Config) -> None:
-    if config.pluginmanager.hasplugin("asyncio"):
+    if (config.getini("playwright_pytest_asyncio") is None and config.pluginmanager.hasplugin("asyncio")) or config.getini("playwright_pytest_asyncio"):
         from pytest_playwright.asyncio import PytestPlaywrightAsyncio
 
         config.pluginmanager.register(PytestPlaywrightAsyncio())
