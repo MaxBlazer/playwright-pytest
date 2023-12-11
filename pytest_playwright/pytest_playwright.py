@@ -143,13 +143,7 @@ def browser_type_launch_args(pytestconfig: Any) -> Dict:
 
 
 def _is_debugger_attached() -> bool:
-    pydevd = sys.modules.get("pydevd")
-    if not pydevd or not hasattr(pydevd, "get_global_debugger"):
-        return False
-    debugger = pydevd.get_global_debugger()
-    if not debugger or not hasattr(debugger, "is_attached"):
-        return False
-    return debugger.is_attached()
+    return sys.gettrace() is not None
 
 
 def _build_artifact_test_folder(
